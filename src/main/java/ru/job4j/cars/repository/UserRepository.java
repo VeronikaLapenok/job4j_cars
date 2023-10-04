@@ -63,43 +63,60 @@ public class UserRepository {
 
     public List<User> findAllOrderById() {
         Session session = sf.openSession();
-        session.beginTransaction();
-        Query<User> query = session.createQuery(
-                "from User order by id asc", User.class);
-
-        session.getTransaction().commit();
+        Query<User> query = null;
+        try {
+            session.beginTransaction();
+            query = session.createQuery(
+                    "from User order by id asc", User.class);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        }
         return query.list();
     }
 
     public Optional<User> findById(int userId) {
         Session session = sf.openSession();
-        session.beginTransaction();
-        Query<User> query = session.createQuery(
+        Query<User> query = null;
+        try {
+            session.beginTransaction();
+            query = session.createQuery(
                     "from User as u WHERE u.id = :fId", User.class);
-        query.setParameter("fId", userId);
-        var user = query.uniqueResult();
-        session.getTransaction().commit();
-        return Optional.ofNullable(user);
+            query.setParameter("fId", userId);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        }
+        return query.uniqueResultOptional();
     }
 
     public List<User> findByLikeLogin(String key) {
         Session session = sf.openSession();
-        session.beginTransaction();
-        Query<User> query = session.createQuery(
-                "from User as u WHERE u.login LIKE :fKey", User.class);
-        query.setParameter("fKey", "%" + key + "%");
-        session.getTransaction().commit();
+        Query<User> query = null;
+        try {
+            session.beginTransaction();
+            query = session.createQuery(
+                    "from User as u WHERE u.login LIKE :fKey", User.class);
+            query.setParameter("fKey", "%" + key + "%");
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        }
         return query.list();
     }
 
     public Optional<User> findByLogin(String login) {
         Session session = sf.openSession();
-        session.beginTransaction();
-        Query<User> query = session.createQuery(
-                "from User as u WHERE u.login = :fLogin", User.class);
-        query.setParameter("fLogin", login);
-        var user = query.uniqueResult();
-        session.getTransaction().commit();
-        return Optional.ofNullable(user);
+        Query<User> query = null;
+        try {
+            session.beginTransaction();
+            query = session.createQuery(
+                    "from User as u WHERE u.login = :fLogin", User.class);
+            query.setParameter("fLogin", login);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        }
+        return query.uniqueResultOptional();
     }
 }
